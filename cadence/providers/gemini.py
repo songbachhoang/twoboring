@@ -42,11 +42,13 @@ class GeminiProvider(Provider):
         self.cfg = provider_cfg
         self.api_key = resolve_env(provider_cfg.api_key)
         self._client = None
+        self._types = None
 
     def _client_lazy(self):
         if self._client is None:
             try:
                 from google import genai
+                from google.genai import types
             except ImportError as exc:
                 raise RuntimeError(
                     "Gemini SDK missing — pip install 'cadence-android[gemini]'"
@@ -57,10 +59,25 @@ class GeminiProvider(Provider):
                     "(config provider.api_key: env:GEMINI_API_KEY)"
                 )
             self._client = genai.Client(api_key=self.api_key)
+            self._types = types
         return self._client
+
+    def _gen_config(self):
+        types = self._types
+        kwargs = dict(
+            max_output_tokens=self.cfg.max_output_tokens,
+            response_mime_type="application/json",   # force JSON for the scaffolded parser
+        )
+        # `thinking: off` is the single biggest cost lever (docs/CONFIGURATION.md).
+        # low/high are left at the model default for now — per-model budget tuning
+        # is a follow-up once we've measured real runs.
+        if self.cfg.thinking == "off":
+            kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
+        return types.GenerateContentConfig(**kwargs)
 
     def decide(self, screenshot, goal, history, hints=None) -> Decision:
         client = self._client_lazy()
+        types = self._types
         prompt = _PROMPT.format(
             goal=goal,
             history=", ".join(history[-5:]) or "none",
@@ -69,9 +86,10 @@ class GeminiProvider(Provider):
         resp = client.models.generate_content(
             model=self.cfg.model,
             contents=[
-                {"inline_data": {"mime_type": "image/png", "data": screenshot}},
+                types.Part.from_bytes(data=screenshot, mime_type="image/png"),
                 prompt,
             ],
+            config=self._gen_config(),
         )
         return parse_decision(getattr(resp, "text", "") or "")
 
