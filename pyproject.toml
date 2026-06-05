@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cadence-android"
+version = "0.1.0"
+description = "Provider-agnostic, vision-driven UI automation for Android — plain-English routines on a real device."
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+license = { text = "MIT" }
+authors = [{ name = "Cadence contributors" }]
+keywords = ["android", "automation", "adb", "ui-automation", "qa", "computer-use"]
+dependencies = [
+  "PyYAML>=6.0",
+  "Pillow>=10.0",
+]
+
+[project.optional-dependencies]
+gemini = ["google-genai>=0.3"]
+anthropic = ["anthropic>=0.40"]
+openai = ["openai>=1.40"]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+cadence = "cadence.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["cadence*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

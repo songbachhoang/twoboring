@@ -1,0 +1,51 @@
+# Example app profile. Copy to profiles/<your-app>.yaml and edit.
+# Schema + authoring guide: docs/PROFILES.md
+# Run a task:  cadence run --profile example login_smoke_test
+
+profile:
+  id: example
+  name: "Example App"
+  package: com.example.app          # find yours: adb shell pm list packages | grep -i <app>
+
+tasks:
+  login_smoke_test:
+    label: "Login smoke test"
+    goal: >
+      From the launcher, open the app, sign in with the saved credentials,
+      and confirm the home screen loads. Report success or the exact failure point.
+      Read-only after sign-in — do not change any settings.
+
+  checkout_smoke_test:
+    label: "Checkout smoke test"
+    goal: >
+      From the home screen, search for a product, open the first result,
+      add it to the cart, open the cart, and proceed to the checkout screen.
+      STOP at the checkout screen. Do NOT enter payment details or place an order.
+      Report whether each step succeeded.
+
+  morning_triage:
+    label: "Morning inbox triage (personal, own account)"
+    goal: >
+      Open the inbox, archive every newsletter, and leave everything else untouched.
+      Report how many items were archived.
+
+interstitials:
+  - name: "event popup"
+    looks_like: "A promotional banner overlay with a close (X) button, usually top-right."
+    dismiss: "Tap the close / X button."
+  - name: "rate-the-app prompt"
+    looks_like: "A modal asking the user to rate the app, with 'Later' / 'No thanks'."
+    dismiss: "Tap 'Later' or 'No thanks'. Never tap 'Rate now'."
+  - name: "what's-new / changelog"
+    looks_like: "A full-screen 'What's new' screen after an update, with a dismiss button."
+    dismiss: "Tap the dismiss / Got it / Continue button."
+
+pacing:
+  settle_timeout_ms: 4000
+  post_action_wait_ms: 700
+
+anchors:
+  home: "The main home screen with the bottom navigation bar."
+  cart: "The cart screen listing items with a 'Checkout' button."
+
+# TODO: add seasonal-event popups as you encounter them on real runs.

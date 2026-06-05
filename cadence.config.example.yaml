@@ -1,0 +1,45 @@
+# Cadence example config. Copy to cadence.config.yaml and edit.
+# Every field has a sane default; change only what you need.
+# Full reference: docs/CONFIGURATION.md
+
+device:
+  serial: auto            # auto = first `adb devices` entry; or a specific serial
+  backend: adb            # adb | shizuku | root   (see docs/INSTALL.md)
+  screenshot_scale: 0.5   # downscale screenshots to cut image-input tokens
+  resolution: auto        # auto-detected; override as "1080x2400" only if needed
+
+provider:
+  name: gemini
+  model: gemini-3-flash-preview   # the model with built-in Computer Use
+  api_key: env:GEMINI_API_KEY     # env:VAR reads from environment — never hard-code keys
+  thinking: low                   # off | low | high  (Gemini-only; keep low for menus)
+  max_output_tokens: 512
+
+classifier:
+  enabled: true
+  name: gemini
+  model: gemini-3.1-flash-lite
+  api_key: env:GEMINI_API_KEY
+
+humanization:
+  enabled: true
+  timing: lognormal       # lognormal | gamma | fixed
+  base_delay_ms: 800
+  tap_jitter: true
+  tap_duration_ms: [60, 150]
+  swipe_curve: bezier     # bezier | linear
+  imperfection_rate: 0.05
+  session_window_min: 120
+
+run:
+  confirm_before_execute: true   # keep this true
+  max_steps: 120
+  stop_on_unknown_after: 3
+  settle_timeout_ms: 4000
+  post_tap_wait_ms: 700
+  verify_screen_change: true
+  log_dir: ./runs
+  dry_run: false
+
+cache:
+  enabled: true

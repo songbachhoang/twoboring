@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+
+# Cadence
+runs/                 # run logs contain screenshots — never commit (docs/SAFETY.md)
+cadence.config.yaml   # your local config; may reference local paths
+.env
+*.local.yaml
